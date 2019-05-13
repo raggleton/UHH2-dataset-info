@@ -43,18 +43,18 @@ def get_ntuple_filenames_from_xml(full_filename):
                 yield this_line
 
 
-def get_of_xml_files(top_directory):
-    """Summary
+def get_ntuples_from_xml_files(top_directory):
+    """Get iterator over ntuples in XML files in a directory.
+    Looks recursively through directories for XML files.
 
     Parameters
     ----------
     top_directory : str
-        Description
 
     Yields
     ------
-    TYPE
-        Description
+    (str, iterator)
+        Returns (relative path of XML file, ntuple filename iterator)
     """
     data = []
     for (dirpath, dirnames, filenames) in os.walk(top_directory):
@@ -67,6 +67,21 @@ def get_of_xml_files(top_directory):
 
 
 def get_user_from_filename(ntuple_filename):
+    """Get username from full filepath
+
+    e.g. :
+    get_user_from_filename("/nfs/dust/cms/user/robin/UHH2/20190215/Ntuple_RSGluonToTT_M-4000_2016v2.root")
+    >> robin
+
+    Parameters
+    ----------
+    ntuple_filename : str
+
+    Returns
+    -------
+    str
+        Username, or None if not found
+    """
     if "/user/" not in ntuple_filename:
         return None
     parts = ntuple_filename.split("/")
@@ -77,6 +92,21 @@ def get_user_from_filename(ntuple_filename):
 
 
 def get_year_from_dir(dirname):
+    """Get dataset year from XML filepath.
+
+    e.g.
+    get_year_from_dir("../common/dataset/RunII_102X_v1/2017v2/MC_TTbar.xml")
+    >> "2017v2"
+
+    Parameters
+    ----------
+    dirname : str
+
+    Returns
+    -------
+    str
+        Year, or None if not found
+    """
     parts = dirname.split("/")
     branch = "RunII_102X_v1"
     if branch in dirname:
@@ -104,10 +134,10 @@ if __name__ == "__main__":
 
     data = []
 
-    with open("missing.txt", "w") as f_missing:
+    with open("missing.txt", "w") as f_missing:  # save missing ones to file as well
 
         counter = 0
-        for ind, (xml_rel_path, ntuple_iter) in enumerate(get_of_xml_files(os.path.abspath(args.topDir))):
+        for ind, (xml_rel_path, ntuple_iter) in enumerate(get_ntuples_from_xml_files(os.path.abspath(args.topDir))):
             for ntuple_filename in ntuple_iter:
 
                 counter += 1
@@ -130,8 +160,9 @@ if __name__ == "__main__":
                     "year": year,
                 })
 
+                # Sleep every so often to avoid too much stress on filesystem
                 if counter % 5000 == 0:
-                    print("Done",counter,", sleeping for 5s...")
+                    print("Done", counter, ", sleeping for 5s...")
                     sleep(5)
 
             # if ind > 3:
