@@ -58,7 +58,7 @@ def get_of_xml_files(top_directory):
     """
     data = []
     for (dirpath, dirnames, filenames) in os.walk(top_directory):
-        print(dirpath)
+        print("Looking in", dirpath)
         for filename in filenames:
             full_filename = os.path.join(dirpath, filename)
             rel_path = os.path.relpath(full_filename, top_directory)
@@ -104,26 +104,38 @@ if __name__ == "__main__":
 
     data = []
 
-    counter = 0
-    for ind, (xml_rel_path, ntuple_iter) in enumerate(get_of_xml_files(os.path.abspath(args.topDir))):
-        for ntuple_filename in ntuple_iter:
-            counter += 1
-            user = get_user_from_filename(ntuple_filename)
-            # size = np.random.random() * 100  # dummy data for testing
-            size = os.path.getsize(ntuple_filename) / (1024.0 * 1024.0)  # to MBytes
-            year = get_year_from_dir(xml_rel_path)
-            data.append({
-                "xmldir": os.path.dirname(xml_rel_path),
-                "ntuple": ntuple_filename,
-                "size": size,
-                "user": user,
-                "year": year,
-            })
+    with open("missing.txt", "w") as f_missing:
 
-            # sleep every so often to avoid hammering the system
-            if counter % 1000 == 0:
-                print("Processed", counter, "files, sleeping for 5s...")
-                sleep(5)
+        counter = 0
+        for ind, (xml_rel_path, ntuple_iter) in enumerate(get_of_xml_files(os.path.abspath(args.topDir))):
+            for ntuple_filename in ntuple_iter:
+
+                counter += 1
+
+                if not os.path.isfile(ntuple_filename):
+                    print(ntuple_filename, "does not exist, skipping")
+                    f_missing.write(ntuple_filename)
+                    f_missing.write("\n")
+                    continue
+
+                # size = np.random.random() * 100  # dummy data for testing
+                user = get_user_from_filename(ntuple_filename)
+                size = os.path.getsize(ntuple_filename) / (1024.0 * 1024.0)  # to MBytes
+                year = get_year_from_dir(xml_rel_path)
+                data.append({
+                    "xmldir": os.path.dirname(xml_rel_path),
+                    "ntuple": ntuple_filename,
+                    "size": size,
+                    "user": user,
+                    "year": year,
+                })
+
+                if counter % 5000 == 0:
+                    print("Done",counter,", sleeping for 5s...")
+                    sleep(5)
+
+            # if ind > 3:
+            #     break
 
     df = pd.DataFrame(data)
     df['user'] = df['user'].astype('category')
@@ -131,9 +143,11 @@ if __name__ == "__main__":
     df['year'] = df['year'].astype('category')
 
     print(df.head())
+    print(df.tail())
     print(df.dtypes)
     print(df.describe())
+    print(df.memory_usage(deep=True))
     print(len(df.index))
-    print("Total size: %.3f TB" % (df['size'].sum() / (1024*1024.)))
+    # print(data)
 
     df.to_csv(args.csv)
