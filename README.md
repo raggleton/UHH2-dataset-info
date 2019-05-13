@@ -16,11 +16,12 @@ Should work in both python2 & 3.
 1) Run `datasetInfo.py` on NFS machine:
 
 ```
-./datasetInfo.py <location of UHH2/common/datasets/RunII_102X_v1> --csv datasetinfo_full.csv
+./datasetInfo.py <location of UHH2/common/datasets/RunII_102X_v1> --csv datasetinfo_DD_MON_YY.csv
 ```
 
 This will take a while, since it pauses every 1K files to ease up on the filesystem. (TODO: just run with `nice` instead?)
 This script makes a (large) CSV file that can then be used for later processing.
+It also produces `missing.txt`, with a list of all ntuples in and XMl file but not found on disk.
 
 2) Run the jupyter notebook:
 
