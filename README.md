@@ -21,7 +21,7 @@ This will take a while, since it pauses every 5K files to ease up on the filesys
 This script makes a (large) CSV file that can then be used for later processing.
 It also produces a file `datasetinfo_DD_MON_YY_missing.txt`, with a list of all ntuples in an XMl file but not found on disk.
 
-2) Run the jupyter notebook:
+2) Run the jupyter notebook (locally is easier):
 
 ```
 jupyter notebook UHH2_Ntuple_Info.ipynb
