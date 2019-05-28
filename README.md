@@ -6,12 +6,12 @@ Should work in both python2 & 3.
 
 ## Prerequisites
 
-- Local copy of UHH2 code (currently only for RunII_102X_v1 branch)
-- `numpy`, `matplotlib`, `pandas`, `jupyter` python libraries. Easily installable with the included `requirements.txt`: `pip install -r requirements.txt`
+- Copy of UHH2 code
+- `numpy`, `matplotlib`, `pandas`, `jupyter` python libraries. Easily installable with the included `requirements.txt`: `pip install -r requirements.txt`. Note that only `pandas` and `numpy` are required to collect the data to CSV file, and these are already in CMSSW_10_2_X.
 
 ## Running
 
-1) Run `datasetInfo.py` on NFS machine:
+1) Run `datasetInfo.py` on NFS machine (best done within CMSSW environment):
 
 ```
 ./datasetInfo.py <location of UHH2/common/datasets/RunII_102X_v1> --csv datasetinfo_DD_MON_YY.csv
