@@ -87,6 +87,7 @@ def get_user_from_filename(ntuple_filename):
     """
     if "/user/" not in ntuple_filename:
         return None
+    ntuple_filename = ntuple_filename.replace("//", "/")
     parts = ntuple_filename.split("/")
     ind = parts.index("user")
     if ind == len(parts)-1:
