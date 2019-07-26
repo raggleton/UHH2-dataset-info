@@ -142,14 +142,19 @@ def get_all_data(top_dir, missing_filename):
     data = []
     # Save missing file info to separate file
     print("Saving missing file info to", missing_filename)
-    with open(missing_filename, "w") as f_missing:
+    missing_filename_all = os.path.splitext(missing_filename)[0]+"_all"+os.path.splitext(missing_filename)[1]
+    print("Saving completelmy missing file info to", missing_filename_all)
+    with open(missing_filename, "w") as f_missing, open(missing_filename_all, "w") as f_missing_all:
         top_dir = os.path.abspath(top_dir)
-        counter = 0
+        counter = 0  # count global num files
         for ind, (xml_rel_path, ntuple_iter) in enumerate(get_ntuples_from_xml_files(top_dir)):
             first_time = True
 
+            this_counter = 0  # count files in this xml
+            missing_counter = 0  # count missing files in this xml
             for ntuple_filename in ntuple_iter:
 
+                this_counter += 1
                 counter += 1
 
                 if not os.path.isfile(ntuple_filename):
@@ -162,6 +167,7 @@ def get_all_data(top_dir, missing_filename):
                         first_time = False
                     f_missing.write(ntuple_filename)
                     f_missing.write("\n")
+                    missing_counter += 1
                     continue
 
                 # size = np.random.random() * 100  # dummy data for testing
@@ -180,6 +186,13 @@ def get_all_data(top_dir, missing_filename):
                 if counter % 5000 == 0:
                     print("Done", counter, ", sleeping for 5s...")
                     sleep(5)
+
+            if missing_counter > 0:
+                if missing_counter == this_counter:
+                    f_missing_all.write(xml_rel_path+"\n")
+                    print("All ntuples in", xml_rel_path, "are missing")
+                else:
+                    print("Some but not all ntuples in", xml_rel_path, "are missing")
     return data
 
 
